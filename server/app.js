@@ -1,4 +1,8 @@
 const express = require("express");
+const app = express();
+
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 const logger = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -7,7 +11,6 @@ dotenv.config();
 require("./config/passport.config");
 const userRouter = require("./routes/user.routes");
 
-const app = express();
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 app.use(logger(formatsLogger));
@@ -29,6 +32,23 @@ mongoose.connection.once("open", () => {
   console.log("Database connection successful");
 });
 
+// Extended: https://swagger.io/specification/#infoObject
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: "Wallet API",
+      description: "Wallet API Information",
+      contact: {
+        name: "Mateusz Potocki",
+      },
+      servers: ["http://localhost:3000"],
+    },
+  },
+  apis: ["./routes/*.js"],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api/users", userRouter);
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
