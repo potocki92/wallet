@@ -6,7 +6,11 @@ dotenv.config();
 const { v4: uuidv4 } = require("uuid");
 
 const User = require("../models/user.model");
-const { findUserByEmail } = require("../service/user.service");
+const {
+  findUserByEmail,
+  updateKeyForUser,
+  findUserByToken,
+} = require("../service/user.service");
 const SECRET_KEY = process.env.SECRET_KEY;
 
 const userSchema = Joi.object({
@@ -72,15 +76,114 @@ const signup = async (req, res, _) => {
 };
 
 const signin = async (req, res, _) => {
-  res.send("Signin");
+  try {
+    const { value, errorMessage } = userSchema.validate(req.body);
+    const { email, password } = value;
+
+    if (errorMessage) {
+      return res.status(400).json({ message: errorMessage.message });
+    }
+
+    const toLowerCaseEmail = email.toLowerCase();
+    const user = await findUserByEmail(toLowerCaseEmail);
+    const id = user.id;
+    const isPasswordValid = await passwordValid(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        status: "Unauthorized",
+        code: 401,
+        message: "Email or password is wrong",
+        data: "Unauthorized",
+      });
+    }
+
+    const payload = { id };
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+    await updateKeyForUser({ token }, id);
+
+    return res.json({
+      status: "Success",
+      code: 200,
+      data: {
+        token,
+        user: {
+          email: user.email,
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({
+      status: "Error",
+      code: 500,
+      message: "Server error",
+    });
+  }
 };
 
 const logout = async (req, res, _) => {
-  res.send("Logout");
+  try {
+    let token = req.user.token;
+
+    if (!token) {
+      return res.status(401).json({
+        status: "Unauthorized",
+        code: 401,
+        message: "Not authorized",
+      });
+    }
+
+    const user = await findUserByToken(token);
+    const id = user.id;
+    token = null;
+
+    await updateKeyForUser({ token }, id);
+    return res.json({
+      status: "Success",
+      code: 200,
+      message: "User successfully logged out",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      status: "Error",
+      code: 500,
+      message: "Server error",
+    });
+  }
 };
 
 const current = async (req, res, _) => {
-  res.send("Current");
+  try {
+    const token = req.user.token;
+
+    if (!token) {
+      return res.status(401).json({
+        status: "Unauthorized",
+        code: 401,
+        message: "Not authorized",
+      });
+    }
+    const user = await findUserByToken(token);
+    return res.json({
+      status: "Success",
+      code: 200,
+      data: {
+        currentUser: {
+          email: user.email,
+          subscription: user.subscription,
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      status: "Error",
+      code: 500,
+      message: "Server error",
+    });
+  }
 };
 module.exports = {
   signup,
