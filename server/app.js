@@ -10,6 +10,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 require("./config/passport.config");
 const userRouter = require("./routes/user.routes");
+const transactionRouter = require("./routes/transactions.routes");
+const categoriesRouter = require("./routes/categories.routes");
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
@@ -50,6 +52,8 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api/users", userRouter);
+app.use("/api/transactions", transactionRouter);
+app.use("/api/categories", categoriesRouter);
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
