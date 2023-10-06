@@ -11,25 +11,26 @@ const router = express.Router();
 
 /**
  * @swagger
- * /signup:
+ * /api/users/signup:
  *   post:
  *     summary: User sign-up
  *     description: Register a new user.
  *     tags:
  *       - User
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: user@example.com
- *               password:
- *                 type: string
- *                 example: mypassword123
+ *     parameters:
+ *       - in: body
+ *         name: user
+ *         description: The user to create.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             email:
+ *               type: string
+ *               example: user@example.com
+ *             password:
+ *               type: string
+ *               example: mypassword123
  *     responses:
  *       201:
  *         description: Created
@@ -103,25 +104,26 @@ const router = express.Router();
 router.post("/signup", signup);
 /**
  * @swagger
- * /signin:
+ * /api/users/signin:
  *   post:
  *     summary: User sign-in
  *     description: Authenticate and sign in a user.
  *     tags:
  *       - User
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: user@example.com
- *               password:
- *                 type: string
- *                 example: mypassword123
+ *     parameters:
+ *       - in: body
+ *         name: user
+ *         description: The user to create.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             email:
+ *               type: string
+ *               example: user@example.com
+ *             password:
+ *               type: string
+ *               example: mypassword123
  *     responses:
  *       200:
  *         description: Success
@@ -195,14 +197,19 @@ router.post("/signup", signup);
 router.post("/signin", signin);
 /**
  * @swagger
- * /logout:
+ * /api/users/logout:
  *   get:
  *     summary: Logout user
  *     description: Logout the currently authenticated user.
  *     tags:
  *       - User
- *     security:
- *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     responses:
  *       200:
  *         description: Success
@@ -257,14 +264,19 @@ router.post("/signin", signin);
 router.get("/logout", auth, logout);
 /**
  * @swagger
- * /current:
+ * /api/users/current:
  *   get:
  *     summary: Get current user information
  *     description: Retrieve information about the currently authenticated user.
  *     tags:
  *       - User
- *     security:
- *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     responses:
  *       200:
  *         description: Success
@@ -273,22 +285,15 @@ router.get("/logout", auth, logout);
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     currentUser:
- *                       type: object
- *                       properties:
- *                         email:
- *                           type: string
- *                           example: user@example.com
- *                         subscription:
- *                           type: string
- *                           enum:
- *                             - starter
- *                             - pro
- *                             - business
- *                           example: starter
+ *                 status:
+ *                   type: string
+ *                   example: Success
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: User current signed in
  *       401:
  *         description: Unauthorized
  *         content:
