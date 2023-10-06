@@ -17,6 +17,7 @@ const userSchema = Joi.object({
   email: Joi.string().email({ minDomainSegments: 2 }).required(),
   password: Joi.string().min(7).required(),
 });
+
 const hashPassword = async (password) => {
   const salt = await bCrypto.genSalt(10);
   const hashPassword = await bCrypto.hash(password, salt);
@@ -30,6 +31,7 @@ const passwordValid = async (password, userPassword) => {
   const isValid = await validPassword(password, userPassword);
   return isValid;
 };
+
 const signup = async (req, res, _) => {
   try {
     const { value, error } = userSchema.validate(req.body);
@@ -172,7 +174,6 @@ const current = async (req, res, _) => {
       data: {
         currentUser: {
           email: user.email,
-          subscription: user.subscription,
         },
       },
     });
