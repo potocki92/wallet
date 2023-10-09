@@ -12,13 +12,13 @@ const getCategories = async (userId) => {
 
 const addCategories = async (name, color, owner) => {
   try {
-    const newTransaction = await Category.create({
+    const newCategory = await Category.create({
       name: name,
       color: color,
       owner: owner,
     });
 
-    return newTransaction;
+    return newCategory;
   } catch (error) {
     console.error("Error during add transaction:", error);
     throw error;
