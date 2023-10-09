@@ -10,6 +10,11 @@ const categoriesSchema = new mongoose.Schema(
       type: String,
       required: [true, "Category color is required"],
     },
+    owner: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      ref: "user",
+    },
   },
   { versionKey: false, timestamps: true }
 );

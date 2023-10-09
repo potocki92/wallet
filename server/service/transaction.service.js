@@ -10,11 +10,14 @@ const getTransactions = async (userId) => {
   }
 };
 
-const addTransactions = async (name, color, owner) => {
+const addTransactions = async (date, income, category, comment, sum, owner) => {
   try {
     const newTransaction = await Transaction.create({
-      name: name,
-      color: color,
+      date: date,
+      income: income,
+      categories: category,
+      comment: comment,
+      sum: sum,
       owner: owner,
     });
 
@@ -24,4 +27,25 @@ const addTransactions = async (name, color, owner) => {
     throw error;
   }
 };
-module.exports = { getTransactions, addTransactions };
+
+const getTransactionById = async (transactionId, ownerId) => {
+  try {
+    const transaction = await Transaction.findOne({
+      owner: ownerId,
+      _id: transactionId,
+    });
+
+    if (!transaction) {
+      const error = new Error("Transaction not found or unauthorized.");
+      error.status = 404;
+      throw error;
+    } else {
+      console.log("Transaction found:", transaction);
+      return transaction;
+    }
+  } catch (error) {
+    console.error("Error during get transaction:", error);
+    throw error;
+  }
+};
+module.exports = { getTransactions, addTransactions, getTransactionById };
