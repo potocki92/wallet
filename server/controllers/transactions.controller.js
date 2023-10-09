@@ -9,10 +9,11 @@ const Transaction = require("../models/transaction.model");
 const {
   getTransactions,
   addTransactions,
+  getTransactionById,
 } = require("../service/transaction.service");
 const SECRET_KEY = process.env.SECRET_KEY;
 
-const transactionGet = async (req, res, next) => {
+const allTransactions = async (req, res, next) => {
   const { userId } = req.body;
   try {
     const transaction = await getTransactions(userId);
@@ -24,14 +25,17 @@ const transactionGet = async (req, res, next) => {
 
 const createTransaction = async (req, res, next) => {
   try {
-    const { name, color } = req.body;
+    const { date, income, category, comment, sum } = req.body;
 
     const schema = Joi.object({
-      name: Joi.string().required(),
-      color: Joi.string().required(),
+      date: Joi.date().required(),
+      income: Joi.boolean().required(),
+      category: Joi.string().required(),
+      comment: Joi.string(),
+      sum: Joi.number().required(),
     });
 
-    const { error } = schema.validate({ name, color });
+    const { error } = schema.validate({ date, income, category, comment, sum });
 
     if (error) {
       res.status(400).json({
@@ -40,13 +44,30 @@ const createTransaction = async (req, res, next) => {
       return;
     }
 
-    const newTransaction = await addTransactions(name, color, req.user._id);
+    const newTransaction = await addTransactions(
+      date,
+      income,
+      category,
+      comment,
+      sum,
+      req.user._id
+    );
     res.status(200).json(newTransaction);
   } catch (err) {
     next(err);
   }
 };
+
+const getTransaction = async (req, res, next) => {
+  try {
+    const transaction = await getTransactionById(req.params.id, req.user._id);
+    res.status(200).json(transaction);
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
-  transactionGet,
+  allTransactions,
   createTransaction,
+  getTransaction,
 };
