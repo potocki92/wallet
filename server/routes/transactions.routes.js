@@ -1,14 +1,273 @@
 const express = require("express");
 const { auth } = require("../middleware/auth");
 const {
-  transactionGet,
+  allTransactions,
   createTransaction,
+  getTransaction,
 } = require("../controllers/transactions.controller");
 
 const router = express.Router();
 
-router.get("/", transactionGet);
-router.get("/:id");
+/**
+ * @swagger
+ * /api/transactions:
+ *   get:
+ *     summary: Get transactions
+ *     description: Get transactions
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Unauthorized
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Not authorized
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.get("/", auth, allTransactions);
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   get:
+ *     summary: Get a transaction by ID
+ *     description: Retrieve a transaction by its ID.
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the transaction to retrieve.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 1234567890abcdef12345678
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Success
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     transaction:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: Blue
+ *                         color:
+ *                           type: string
+ *                           example: "#FFFFFF"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Unauthorized
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Not authorized
+ *       404:
+ *         description: Not Found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Not Found
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: Transaction not found
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.get("/:id", auth, getTransaction);
+/**
+ * @swagger
+ * /api/transactions:
+ *   post:
+ *     summary: Create a new transaction
+ *     description: Create a new transaction
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: body
+ *         name: transactions
+ *         description: Transaction to be created
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             date:
+ *               type: date
+ *               example: 2023-10-09T09:55:34.412Z
+ *             income:
+ *               type: boolean
+ *               example: true
+ *             categories:
+ *               type: string
+ *               example: "car"
+ *             comment:
+ *               type: string
+ *               example: "Car when was sold"
+ *             sum:
+ *               type: number
+ *               example: 20000
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       201:
+ *         description: Created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Created
+ *                 code:
+ *                   type: integer
+ *                   example: 201
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     category:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: Blue
+ *                         color:
+ *                           type: string
+ *                           example: "#FFFFFF"
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: missing required name - field
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Unauthorized
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Not authorized
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
 router.post("/", auth, createTransaction);
 router.put("/:id");
 router.delete("/:id");
