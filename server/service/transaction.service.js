@@ -48,4 +48,30 @@ const getTransactionById = async (transactionId, ownerId) => {
     throw error;
   }
 };
-module.exports = { getTransactions, addTransactions, getTransactionById };
+
+const updateTransactionById = async (userId, transactionId, body) => {
+  try {
+    const transaction = await Transaction.findByIdAndUpdate(
+      { owner: userId, _id: transactionId },
+      body,
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
+    if (!transaction) {
+      throw new Error("Transaction not found");
+    }
+
+    return transaction;
+  } catch (err) {
+    console.error("Error during update transaction:", err);
+    throw err;
+  }
+};
+module.exports = {
+  getTransactions,
+  addTransactions,
+  getTransactionById,
+  updateTransactionById,
+};

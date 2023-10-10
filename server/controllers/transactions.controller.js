@@ -10,6 +10,7 @@ const {
   getTransactions,
   addTransactions,
   getTransactionById,
+  updateTransactionById,
 } = require("../service/transaction.service");
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -66,8 +67,41 @@ const getTransaction = async (req, res, next) => {
     next(err);
   }
 };
+
+const updateTransaction = async (req, res, next) => {
+  try {
+    const {
+      user,
+      body,
+      params: { id },
+    } = req;
+
+    const schema = Joi.object({
+      date: Joi.date(),
+      category: Joi.string(),
+      comment: Joi.string(),
+      sum: Joi.number(),
+    });
+
+    const { error } = schema.validate(body);
+
+    if (error) {
+      res.status(400).json({ message: "missing fields" });
+      return;
+    }
+
+    const updateTransaction = await updateTransactionById(user._id, id, body);
+    res.status(200).json(updateTransaction);
+  } catch (err) {
+    if (err.message === "Transaction not found") {
+      res.status(404).json({ message: "Transaction not found" });
+    }
+    naxt(err);
+  }
+};
 module.exports = {
   allTransactions,
   createTransaction,
   getTransaction,
+  updateTransaction,
 };
