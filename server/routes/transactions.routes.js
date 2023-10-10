@@ -4,6 +4,7 @@ const {
   allTransactions,
   createTransaction,
   getTransaction,
+  updateTransaction,
 } = require("../controllers/transactions.controller");
 
 const router = express.Router();
@@ -184,7 +185,7 @@ router.get("/:id", auth, getTransaction);
  *             income:
  *               type: boolean
  *               example: true
- *             categories:
+ *             category:
  *               type: string
  *               example: "car"
  *             comment:
@@ -269,7 +270,134 @@ router.get("/:id", auth, getTransaction);
  *                   example: Server error
  */
 router.post("/", auth, createTransaction);
-router.put("/:id");
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   put:
+ *     summary: Update a transaction by ID
+ *     description: Update a transaction by its ID.
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the transaction to update.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 1234567890abcdef12345678
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       - in: body
+ *         name: transaction
+ *         description: Updated transaction data.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             date:
+ *               type: date
+ *               example: 2023-10-09T09:55:34.412Z
+ *             category:
+ *               type: string
+ *               example: "car"
+ *             comment:
+ *               type: string
+ *               example: "Car when was sold"
+ *             sum:
+ *               type: number
+ *               example: 20000
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Success
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     transaction:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: Blue
+ *                         color:
+ *                           type: string
+ *                           example: "#FFFFFF"
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: missing fields
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Unauthorized
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Not authorized
+ *       404:
+ *         description: Not Found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Not Found
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: Transaction not found
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+
+router.put("/:id", auth, updateTransaction);
 router.delete("/:id");
 router.get("/stats/:year/:month");
 router.get("/stats/balance");
