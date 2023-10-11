@@ -1,23 +1,25 @@
-const jwt = require("jsonwebtoken");
 const Joi = require("joi");
-const bCrypto = require("bcryptjs");
 const dotenv = require("dotenv");
 dotenv.config();
-const { v4: uuidv4 } = require("uuid");
-
-const Transaction = require("../models/transaction.model");
 const {
   getTransactions,
   addTransactions,
   getTransactionById,
   updateTransactionById,
+  removeTransaction,
 } = require("../service/transaction.service");
-const SECRET_KEY = process.env.SECRET_KEY;
+const { getStatistics } = require("../utils/getStatistics");
 
-const allTransactions = async (req, res, next) => {
-  const { userId } = req.body;
+const getCurrentMonthTransactions = async (req, res, next) => {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
   try {
-    const transaction = await getTransactions(userId);
+    const transaction = await getTransactions(
+      req.user._id,
+      currentMonth,
+      currentYear
+    );
     res.status(200).json(transaction);
   } catch (err) {
     next(err);
@@ -99,9 +101,43 @@ const updateTransaction = async (req, res, next) => {
     naxt(err);
   }
 };
+
+const deleteTransaction = async (req, res, next) => {
+  try {
+    const transactionId = req.params.id;
+    await removeTransaction(transactionId);
+    res.status(200).json({ message: "transaction deleted successfully" });
+  } catch (err) {
+    if (err.message === "Transaction not found") {
+      res.status(404).json({ message: "Transaction not found" });
+    } else {
+      next(err);
+    }
+  }
+};
+
+const getStatsTransactions = async (req, res, next) => {
+  const { year, month } = req.params;
+
+  try {
+    const transaction = await getTransactions(
+      req.user.id,
+      parseInt(month),
+      parseInt(year),
+    );
+
+    const data = await getStatistics(transaction, req.user.id);
+    res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
 module.exports = {
-  allTransactions,
+  getCurrentMonthTransactions,
   createTransaction,
   getTransaction,
   updateTransaction,
+  deleteTransaction,
+  getStatsTransactions,
 };
