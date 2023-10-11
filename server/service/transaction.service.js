@@ -1,13 +1,29 @@
+const { mongoose } = require("mongoose");
 const Transaction = require("../models/transaction.model");
 
-const getTransactions = async (userId) => {
+const getTransactions = async (userId, month, year) => {
+  const ObjectId = mongoose.Types.ObjectId;
+  const userIdAsObjectId = new ObjectId(userId);
+
   try {
-    const transactions = await Transaction.find({ owner: userId });
-    console.log(transactions);
+    const transactions = await Transaction.aggregate([
+      {
+        $match: {
+          owner: userIdAsObjectId,
+          $expr: {
+            $and: [
+              { $eq: [{ $month: "$date" }, month] },
+              { $eq: [{ $year: "$date" }, year] },
+            ],
+          },
+        },
+      },
+      { $project: { createdAt: 0, updatedAt: 0, owner: 0 } },
+      { $sort: { date: -1 } },
+    ]);
     return transactions;
-  } catch (error) {
-    console.error("Błąd podczas wyszukiwania transakcji:", error);
-    throw error;
+  } catch (err) {
+    next(err);
   }
 };
 
