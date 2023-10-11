@@ -3,6 +3,7 @@ const Transaction = require("../models/transaction.model");
 const getTransactions = async (userId) => {
   try {
     const transactions = await Transaction.find({ owner: userId });
+    console.log(transactions);
     return transactions;
   } catch (error) {
     console.error("Błąd podczas wyszukiwania transakcji:", error);
@@ -69,9 +70,19 @@ const updateTransactionById = async (userId, transactionId, body) => {
     throw err;
   }
 };
+
+const removeTransaction = async (transactionId) => {
+  const transaction = await Transaction.findByIdAndDelete(transactionId);
+
+  if (!transaction) {
+    throw new Error("Transaction not found");
+  }
+  return transaction;
+};
 module.exports = {
   getTransactions,
   addTransactions,
   getTransactionById,
   updateTransactionById,
+  removeTransaction,
 };
