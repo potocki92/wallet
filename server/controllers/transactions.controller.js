@@ -11,13 +11,13 @@ const {
   addTransactions,
   getTransactionById,
   updateTransactionById,
+  removeTransaction,
 } = require("../service/transaction.service");
 const SECRET_KEY = process.env.SECRET_KEY;
 
 const allTransactions = async (req, res, next) => {
-  const { userId } = req.body;
   try {
-    const transaction = await getTransactions(userId);
+    const transaction = await getTransactions(req.user._id);
     res.status(200).json(transaction);
   } catch (err) {
     next(err);
@@ -99,9 +99,24 @@ const updateTransaction = async (req, res, next) => {
     naxt(err);
   }
 };
+
+const deleteTransaction = async (req, res, next) => {
+  try {
+    const transactionId = req.params.id;
+    await removeTransaction(transactionId);
+    res.status(200).json({ message: "transaction deleted successfully" });
+  } catch (err) {
+    if (err.message === "Transaction not found") {
+      res.status(404).json({ message: "Transaction not found" });
+    } else {
+      next(err);
+    }
+  }
+};
 module.exports = {
   allTransactions,
   createTransaction,
   getTransaction,
   updateTransaction,
+  deleteTransaction,
 };
