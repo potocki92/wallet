@@ -1,11 +1,12 @@
 const express = require("express");
 const { auth } = require("../middleware/auth");
 const {
-  allTransactions,
   createTransaction,
   getTransaction,
   updateTransaction,
   deleteTransaction,
+  getStatsTransactions,
+  getCurrentMonthTransactions,
 } = require("../controllers/transactions.controller");
 
 const router = express.Router();
@@ -65,7 +66,7 @@ const router = express.Router();
  *                   type: string
  *                   example: Server error
  */
-router.get("/", auth, allTransactions);
+router.get("/", auth, getCurrentMonthTransactions);
 /**
  * @swagger
  * /api/transactions/{id}:
@@ -186,7 +187,7 @@ router.get("/:id", auth, getTransaction);
  *             income:
  *               type: boolean
  *               example: true
- *             category:
+ *             categories:
  *               type: string
  *               example: "car"
  *             comment:
@@ -475,6 +476,94 @@ router.put("/:id", auth, updateTransaction);
  */
 
 router.delete("/:id", auth, deleteTransaction);
-router.get("/stats/:year/:month");
+/**
+ * @swagger
+ * /api/transactions/stats/{year}/{month}:
+ *   get:
+ *     summary: Get statistics for transactions in a specific year and month
+ *     description: Retrieve statistics for transactions that match the specified year and month.
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: year
+ *         description: The year for which you want to retrieve statistics (e.g., 2023).
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2023
+ *       - in: path
+ *         name: month
+ *         description: The month for which you want to retrieve statistics (e.g., 10 for October).
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Success
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     statistics:
+ *                       type: object
+ *                       description: The statistics for the specified year and month.
+ *                     categories:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         description: List of categories associated with the user.
+ *                       description: List of categories associated with the user.
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Unauthorized
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Not authorized
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.get("/stats/:year/:month", auth, getStatsTransactions);
 router.get("/stats/balance");
 module.exports = router;
