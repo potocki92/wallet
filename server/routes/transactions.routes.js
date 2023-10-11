@@ -5,6 +5,7 @@ const {
   createTransaction,
   getTransaction,
   updateTransaction,
+  deleteTransaction,
 } = require("../controllers/transactions.controller");
 
 const router = express.Router();
@@ -396,9 +397,84 @@ router.post("/", auth, createTransaction);
  *                   type: string
  *                   example: Server error
  */
-
 router.put("/:id", auth, updateTransaction);
-router.delete("/:id");
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   delete:
+ *     summary: Delete a transaction by ID
+ *     description: Delete a transaction by its ID.
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the transaction to delete.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 1234567890abcdef12345678
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Success
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Transaction deleted successfully
+ *       404:
+ *         description: Not Found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Not Found
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: Transaction not found
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+
+router.delete("/:id", auth, deleteTransaction);
 router.get("/stats/:year/:month");
 router.get("/stats/balance");
 module.exports = router;
