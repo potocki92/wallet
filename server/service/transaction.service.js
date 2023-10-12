@@ -95,10 +95,66 @@ const removeTransaction = async (transactionId) => {
   }
   return transaction;
 };
+
+const getExpenses = async (userId) => {
+  const ObjectId = mongoose.Types.ObjectId;
+  const userIdAsObjectId = new ObjectId(userId);
+
+  const pipeline = [
+    {
+      $match: {
+        owner: userIdAsObjectId,
+        income: false,
+      },
+    },
+    {
+      $group: {
+        _id: "$owner",
+        expenses: {
+          $sum: "$sum",
+        },
+      },
+    },
+    { $project: { _id: 0 } },
+  ];
+
+  const result = Transaction.aggregate(pipeline);
+
+  return result;
+};
+
+const getIncome = async (userId) => {
+  const ObjectId = mongoose.Types.ObjectId;
+  const userIdAsObjectId = new ObjectId(userId);
+
+  const pipeline = [
+    {
+      $match: {
+        owner: userIdAsObjectId,
+        income: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$owner",
+        income: {
+          $sum: "$sum",
+        },
+      },
+    },
+    { $project: { _id: 0 } },
+  ];
+
+  const result = Transaction.aggregate(pipeline);
+
+  return result;
+};
 module.exports = {
   getTransactions,
   addTransactions,
   getTransactionById,
   updateTransactionById,
   removeTransaction,
+  getExpenses,
+  getIncome,
 };

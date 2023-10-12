@@ -7,6 +7,7 @@ const {
   deleteTransaction,
   getStatsTransactions,
   getCurrentMonthTransactions,
+  getBalanceTransactions,
 } = require("../controllers/transactions.controller");
 
 const router = express.Router();
@@ -565,5 +566,83 @@ router.delete("/:id", auth, deleteTransaction);
  *                   example: Server error
  */
 router.get("/stats/:year/:month", auth, getStatsTransactions);
-router.get("/stats/balance");
+/**
+ * @swagger
+ * /api/transactions/stats/balance:
+ *   get:
+ *     summary: Get balance statistics for the user's transactions
+ *     description: Retrieve balance statistics, including expenses, income, and the overall balance for the user's transactions.
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for authentication.
+ *         required: true
+ *         type: string
+ *         example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Success
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     expenses:
+ *                       type: number
+ *                       example: 5000
+ *                       description: Total expenses for the user.
+ *                     income:
+ *                       type: number
+ *                       example: 7000
+ *                       description: Total income for the user.
+ *                     balance:
+ *                       type: number
+ *                       example: 2000
+ *                       description: The balance (income - expenses) for the user.
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Unauthorized
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Not authorized
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: Error
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+
+router.get("/stats/balance", auth, getBalanceTransactions);
 module.exports = router;
