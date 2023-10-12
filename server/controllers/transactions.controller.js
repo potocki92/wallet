@@ -7,6 +7,8 @@ const {
   getTransactionById,
   updateTransactionById,
   removeTransaction,
+  getExpenses,
+  getIncome,
 } = require("../service/transaction.service");
 const { getStatistics } = require("../utils/getStatistics");
 
@@ -123,11 +125,30 @@ const getStatsTransactions = async (req, res, next) => {
     const transaction = await getTransactions(
       req.user.id,
       parseInt(month),
-      parseInt(year),
+      parseInt(year)
     );
 
     const data = await getStatistics(transaction, req.user.id);
     res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const getBalanceTransactions = async (req, res, next) => {
+  try {
+    const expensesArray = await getExpenses(req.user.id);
+    const incomeArray = await getIncome(req.user.id);
+
+    const expenses = expensesArray.length > 0 ? expensesArray[0].expenses : 0;
+    const income = incomeArray.length > 0 ? incomeArray[0].income : 0;
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      data: { expenses, income, balance: income - expenses },
+    });
   } catch (err) {
     console.log(err);
     next(err);
@@ -140,4 +161,5 @@ module.exports = {
   updateTransaction,
   deleteTransaction,
   getStatsTransactions,
+  getBalanceTransactions,
 };
