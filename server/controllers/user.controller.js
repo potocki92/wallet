@@ -107,11 +107,9 @@ const signin = async (req, res, _) => {
     return res.json({
       status: "Success",
       code: 200,
-      data: {
-        token,
-        user: {
-          email: user.email,
-        },
+      token,
+      user: {
+        email: user.email,
       },
     });
   } catch (err) {
