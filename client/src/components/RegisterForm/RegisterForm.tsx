@@ -1,10 +1,11 @@
-import InputsForm from "../InputsForm/InputsForm"
+import React from "react";
+import InputsForm from "../InputsForm/InputsForm";
 
-const RegisterForm = () => {
+const RegisterForm: React.FC = () => {
   return (
-    <>
-      <InputsForm buttonText="Register" formType="register"/>
-    </>
+    <div>
+      <InputsForm buttonText="Register" formType="register" />
+    </div>
   );
 };
 

@@ -5,13 +5,15 @@ import { PrivateRoute } from "./PrivateRoute";
 import { useDispatch } from "react-redux/es";
 import { useAuth } from "../hooks/useAuth";
 import { refreshUser } from "../api/auth/operations";
+import { useAppDispatch } from "../api/hooks";
+import Register from "../pages/Register";
 
 const HomePage = lazy(() => import("../pages/Home"));
 const RegisterPage = lazy(() => import("../pages/Register"));
 const LoginPage = lazy(() => import("../pages/Login"));
 
 export const App = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isRefreshing } = useAuth();
 
   useEffect(() => {
@@ -29,21 +31,21 @@ export const App = () => {
               element={
                 <RestrictedRoute
                   redirectTo="/home"
-                  component={<RegisterPage />}
+                  component={Register}
                 />
               }
             />
             <Route
               path="/login"
               element={
-                <RestrictedRoute redirectTo="/home" component={<LoginPage />} />
+                <RestrictedRoute redirectTo="/home" component={LoginPage} />
               }
             />
             <Route path="/register" element={<RegisterPage />} />
             <Route
               path="/home"
               element={
-                <PrivateRoute redirectTo="/login" component={<HomePage />} />
+                <PrivateRoute redirectTo="/login" component={HomePage} />
               }
             />
           </Routes>

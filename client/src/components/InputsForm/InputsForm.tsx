@@ -1,26 +1,34 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { logIn, register } from "../../api/auth/operations";
-import {
-  selectIsLoggedIn,
-  selectUser,
-} from "../../api/auth/selectors";
+import { signIn, register } from "../../api/auth/operations";
+import { selectIsLoggedIn, selectUser } from "../../api/auth/selectors";
+import { useAppDispatch, useAppSelector } from "../../api/hooks";
 
-const InputsForm = ({ buttonText, formType }) => {
-  const dispatch = useDispatch();
-  const user = useSelector(selectUser);
-  const isLoggedIn = useSelector(selectIsLoggedIn);
+interface InputsFormProps {
+  buttonText: string;
+  formType: "login" | "register";
+}
+const InputsForm: React.FC<InputsFormProps> = ({ buttonText, formType }) => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const { email, password } = form.elements;
+    const form = e.currentTarget as HTMLFormElement;
+    const { email, password } = form.elements as any;
 
+    console.log(email.value, password);
+    
     if (formType === "login") {
-      dispatch(logIn({ email: email.value, password: password.value }));
+      try {
+        dispatch(signIn({ email: email.value, password: password.value }));
 
-      console.log(user, isLoggedIn);
+        console.log(user, isLoggedIn);
+      } catch (error) {
+        console.error(error);
+      }
     } else if (formType === "register") {
       dispatch(
         register({
