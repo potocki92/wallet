@@ -51,11 +51,11 @@ export const signIn = createAsyncThunk(
   ) => {
     try {
       dispatch(signInRequest());
-      
+
       const res = await axios.post(`/api/users/signin`, credentials);
       const { token, email } = res.data;
       dispatch(signInSuccess({ token, email }));
-      setAuthHeader(token)
+      setAuthHeader(token);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || "Sign-in failed";
@@ -93,23 +93,19 @@ export const logOut = createAsyncThunk(
 
 export const refreshUser: AsyncThunk<any, void, { state: RootState }> =
   createAsyncThunk("auth/refresh", async (_, { dispatch, getState }) => {
-    dispatch(refreshUserStart());
-
     const state = getState();
-    const persistedToken = state.auth.token
-    console.log(persistedToken);
-    
+    const persistedToken = state.auth.token;
 
-    if (!persistedToken) {
-      dispatch(refreshUserFailure());
-      return;
-    }
-
-    try {
+    if (persistedToken) {
       setAuthHeader(persistedToken);
-      const res = await axios.get("/api/users/current");
-      dispatch(refreshUserSuccess(res.data));
-    } catch (error) {
+      dispatch(refreshUserStart());
+      try {
+        const res = await axios.get("/api/users/current");
+        dispatch(refreshUserSuccess(res.data));
+      } catch (error) {
+        dispatch(refreshUserFailure());
+      }
+    } else {
       dispatch(refreshUserFailure());
     }
   });
