@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { RestrictedRoute } from "./RestrictedRoute";
 import { PrivateRoute } from "./PrivateRoute";
-import { useDispatch } from "react-redux/es";
 import { useAuth } from "../hooks/useAuth";
 import { refreshUser } from "../api/auth/operations";
 import { useAppDispatch } from "../api/hooks";
@@ -11,6 +10,7 @@ import Register from "../pages/Register";
 const HomePage = lazy(() => import("../pages/Home"));
 const RegisterPage = lazy(() => import("../pages/Register"));
 const LoginPage = lazy(() => import("../pages/Login"));
+const AuthenticationPage = lazy(() => import("../pages/Authentication"));
 
 export const App = () => {
   const dispatch = useAppDispatch();
@@ -29,10 +29,7 @@ export const App = () => {
             <Route
               path="*"
               element={
-                <RestrictedRoute
-                  redirectTo="/home"
-                  component={Register}
-                />
+                <RestrictedRoute redirectTo="/home" component={RegisterPage} />
               }
             />
             <Route
