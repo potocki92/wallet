@@ -1,40 +1,40 @@
-import React from "react";
+import { FunctionComponent, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { signIn, register } from "../../api/auth/operations";
-import { selectIsLoggedIn, selectUser } from "../../api/auth/selectors";
-import { useAppDispatch, useAppSelector } from "../../api/hooks";
+import { useAppDispatch } from "../../api/hooks";
 
 interface InputsFormProps {
   buttonText: string;
   formType: "login" | "register";
 }
-const InputsForm: React.FC<InputsFormProps> = ({ buttonText, formType }) => {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector(selectUser);
-  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
-  const handleSubmit = (e: React.FormEvent) => {
+const InputsForm: FunctionComponent<InputsFormProps> = (
+  props: InputsFormProps
+) => {
+  const dispatch = useAppDispatch();
+
+  const actionMap: Record<
+    InputsFormProps["formType"],
+    (email: string, password: string) => void
+  > = {
+    login: (email, password) => dispatch(signIn({ email, password })),
+    register: (email, password) => dispatch(register({ email, password })),
+  };
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
     const { email, password } = form.elements as any;
 
-    console.log(email.value, password);
-    
-    if (formType === "login") {
-      try {
-        dispatch(signIn({ email: email.value, password: password.value }));
-
-        console.log(user, isLoggedIn);
-      } catch (error) {
-        console.error(error);
+    try {
+      const performAction = actionMap[props.formType];
+      if (performAction) {
+        performAction(email.value, password.value);
       }
-    } else if (formType === "register") {
-      dispatch(
-        register({
-          email: email.value,
-          password: password.value,
-        })
-      );
+    } catch (error) {
+      console.log(error);
+      
+      console.error(error);
     }
   };
 
@@ -49,14 +49,14 @@ const InputsForm: React.FC<InputsFormProps> = ({ buttonText, formType }) => {
           Password:
           <input type="password" name="password" id="password" />
         </label>
-        <button type="submit">{buttonText}</button>
-        {formType === "login" ? (
+        <button type="submit">{props.buttonText}</button>
+        {props.formType === "login" ? (
           <span>
             Don't have an account?<Link to={"/register"}>SignUp</Link>
           </span>
         ) : (
           <span>
-            Do you have an account? <Link to={"/login"}>SignIn</Link>
+            Do you have an account? <Link to={"/"}>SignIn</Link>
           </span>
         )}
       </form>
