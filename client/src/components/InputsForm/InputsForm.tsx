@@ -1,5 +1,4 @@
 import { FunctionComponent, FormEvent } from "react";
-import { Link } from "react-router-dom";
 import { signIn, register } from "../../api/auth/operations";
 import { useAppDispatch } from "../../api/hooks";
 import Button from "../Button/Button";
@@ -10,7 +9,7 @@ interface InputsFormProps {
 }
 
 const InputsForm: FunctionComponent<InputsFormProps> = (
-  props: InputsFormProps
+  props: InputsFormProps,
 ) => {
   const dispatch = useAppDispatch();
 
@@ -51,11 +50,18 @@ const InputsForm: FunctionComponent<InputsFormProps> = (
           <input type="password" name="password" id="password" />
         </label>
         <div>
-          <Button buttonText={props.buttonText} buttonColor="#24CCA7" borderColor="#24CCA7"/>
+          <Button
+            buttonText={props.buttonText}
+            buttonColor="#24CCA7"
+          />
           {props.formType === "login" ? (
-            <Button buttonText={"Register"} isLinkButton={true} link={"/register"}/>
-            ) : (
-                <Button buttonText={"Log In"} isLinkButton={true} link={"/"}/>
+            <Button
+              buttonText={"Register"}
+              isLinkButton={true}
+              link={"/register"}
+            />
+          ) : (
+            <Button buttonText={"Log In"} isLinkButton={true} link={"/"} />
           )}
         </div>
       </form>
