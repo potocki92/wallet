@@ -4,30 +4,34 @@ type ButtonProps = {
   buttonText: string;
   isLinkButton?: boolean | false;
   link?: string;
-} & (TransparentBorderColor | BorderColor);
-
-type TransparentBorderColor = {
-  buttonColor?: "transparent";
-  borderColor?: "#4A56E2";
+  buttonColor?: string;
 };
-
-type BorderColor = {
-    buttonColor?: string;
-    borderColor?: string;
-}
-const Button = (props: ButtonProps) => {
+const Button = ({
+  buttonColor = "transparent",
+  isLinkButton,
+  link,
+  buttonText,
+}: ButtonProps) => {
+  const borderColor = buttonColor === "transparent" ? "#4A56E2" : buttonColor;
   return (
     <>
-      <button
-        className={`bg-[${props.buttonColor}] rounded-[20px] border border-[${props.borderColor}] max-w-[300px] w-full h-[50px]`}
-        type="submit"
-      >
-        {props.isLinkButton ? (
-          <Link to={props.link || ""}>{props.buttonText}</Link>
-        ) : (
-          props.buttonText
-        )}
-      </button>
+      {isLinkButton ? (
+        <Link to={link || ""}>
+          <button
+            className={`bg-[${buttonColor}] rounded-[20px] border border-[${borderColor}] max-w-[300px] w-full h-[50px]`}
+            type="submit"
+          >
+            {buttonText}
+          </button>
+        </Link>
+      ) : (
+        <button
+          className={`bg-[${buttonColor}] rounded-[20px] border border-[${borderColor}] max-w-[300px] w-full h-[50px]`}
+          type="submit"
+        >
+          {buttonText}
+        </button>
+      )}
     </>
   );
 };
