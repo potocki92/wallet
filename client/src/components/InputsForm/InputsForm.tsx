@@ -2,6 +2,7 @@ import { FunctionComponent, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { signIn, register } from "../../api/auth/operations";
 import { useAppDispatch } from "../../api/hooks";
+import Button from "../Button/Button";
 
 interface InputsFormProps {
   buttonText: string;
@@ -33,7 +34,7 @@ const InputsForm: FunctionComponent<InputsFormProps> = (
       }
     } catch (error) {
       console.log(error);
-      
+
       console.error(error);
     }
   };
@@ -49,16 +50,14 @@ const InputsForm: FunctionComponent<InputsFormProps> = (
           Password:
           <input type="password" name="password" id="password" />
         </label>
-        <button type="submit">{props.buttonText}</button>
-        {props.formType === "login" ? (
-          <span>
-            Don't have an account?<Link to={"/register"}>SignUp</Link>
-          </span>
-        ) : (
-          <span>
-            Do you have an account? <Link to={"/"}>SignIn</Link>
-          </span>
-        )}
+        <div>
+          <Button buttonText={props.buttonText} buttonColor="#24CCA7" borderColor="#24CCA7"/>
+          {props.formType === "login" ? (
+            <Button buttonText={"Register"} isLinkButton={true} link={"/register"}/>
+            ) : (
+                <Button buttonText={"Log In"} isLinkButton={true} link={"/"}/>
+          )}
+        </div>
       </form>
     </>
   );
